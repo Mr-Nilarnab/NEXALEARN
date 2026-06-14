@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaLearn Academy — School of the Future</title>
+<style>
+/* ─── RESET & ROOT ───────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #04060f;
+  --bg2:     #080d1a;
+  --bg3:     #0c1328;
+  --surface: rgba(255,255,255,0.04);
+  --border:  rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --cyan:    #00e5ff;
+  --purple:  #a855f7;
+  --pink:    #ec4899;
+  --gold:    #f59e0b;
+  --green:   #10b981;
+  --text:    #e2e8f0;
+  --muted:   #64748b;
+  --dim:     #334155;
+  --font: 'Inter', 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+/* ─── SCROLLBAR ──────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 2px; }
+
+/* ─── CANVAS STAR FIELD ─────────────────────── */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ─── NAV ────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 3rem;
+  backdrop-filter: blur(20px);
+  background: rgba(4, 6, 15, 0.85);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s;
+}
+nav.scrolled {
+  padding: 0.65rem 3rem;
+  background: rgba(4, 6, 15, 0.97);
+  box-shadow: 0 0 40px rgba(0,229,255,0.06);
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.nav-logo .logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.nav-logo span { background: linear-gradient(90deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 1px;
+  background: var(--cyan);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a:hover::after { transform: scaleX(1); }
+.nav-cta {
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: #000;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+.nav-ham { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+.nav-ham span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
+
+/* ─── HERO ───────────────────────────────────── */
+#hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 4rem;
+  overflow: hidden;
+}
+.hero-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  animation: ring-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.hero-ring:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
+.hero-ring:nth-child(2) { width: 600px; height: 600px; animation-delay: 0.8s; border-color: rgba(168,85,247,0.1); }
+.hero-ring:nth-child(3) { width: 900px; height: 900px; animation-delay: 1.6s; border-color: rgba(0,229,255,0.05); }
+.hero-ring:nth-child(4) { width: 1200px; height: 1200px; animation-delay: 2.4s; border-color: rgba(168,85,247,0.03); }
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-bottom: 2rem;
+  background: rgba(0,229,255,0.05);
+  animation: fade-up 0.8s ease both;
+}
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: blink 1.5s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero-title {
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 1.5rem;
+  animation: fade-up 0.8s 0.15s ease both;
+}
+.hero-title .line1 { display: block; }
+.hero-title .line2 {
+  display: block;
+  background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%;
+  animation: gradient-flow 4s ease infinite, fade-up 0.8s 0.25s ease both;
+}
+@keyframes gradient-flow { 0%,100%{background-position:0%} 50%{background-position:100%} }
+.hero-sub {
+  max-width: 600px;
+  color: var(--muted);
+  font-size: 1.125rem;
+  margin: 0 auto 2.5rem;
+  animation: fade-up 0.8s 0.35s ease both;
+}
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 4rem;
+  animation: fade-up 0.8s 0.45s ease both;
+}
+.btn-primary {
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: #000;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.2);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+.btn-primary:hover::before { transform: translateX(100%); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,229,255,0.3); }
+.btn-outline {
+  padding: 0.875rem 2rem;
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+.btn-outline:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+.hero-stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fade-up 0.8s 0.55s ease both;
+}
+.hero-stat strong {
+  display: block;
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat span { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+@keyframes fade-up { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── FLOATING PARTICLES ─────────────────────── */
+.particles-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ─── SECTION BASE ───────────────────────────── */
+.section {
+  position: relative;
+  z-index: 1;
+  padding: 7rem 2rem;
+}
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 1.25rem;
+}
+.section-title .grad {
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-sub { color: var(--muted); max-width: 560px; font-size: 1.05rem; }
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin: 0;
+}
+
+/* ─── REVEAL ANIMATIONS ──────────────────────── */
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-40px); transition: all 0.7s ease; }
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(40px); transition: all 0.7s ease; }
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+/* ─── PROGRAMS ───────────────────────────────── */
+#programs { background: var(--bg2); }
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.program-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+  cursor: pointer;
+}
+.program-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(0,229,255,0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.program-card:hover::before { opacity: 1; }
+.program-card:hover { border-color: var(--border2); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,229,255,0.08); }
+.program-card.purple:hover { box-shadow: 0 20px 60px rgba(168,85,247,0.1); }
+.program-card.pink:hover { box-shadow: 0 20px 60px rgba(236,72,153,0.1); }
+.program-card.gold:hover { box-shadow: 0 20px 60px rgba(245,158,11,0.1); }
+.program-card.green:hover { box-shadow: 0 20px 60px rgba(16,185,129,0.1); }
+.prog-icon {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.prog-icon.cyan { background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); }
+.prog-icon.purple { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2); }
+.prog-icon.pink { background: rgba(236,72,153,0.1); border: 1px solid rgba(236,72,153,0.2); }
+.prog-icon.gold { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); }
+.prog-icon.green { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); }
+.program-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+.program-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; }
+.prog-meta { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--muted); }
+.prog-meta span { display: flex; align-items: center; gap: 0.3rem; }
+.prog-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+.tag.c { background: rgba(0,229,255,0.1); color: var(--cyan); border: 1px solid rgba(0,229,255,0.2); }
+.tag.p { background: rgba(168,85,247,0.1); color: var(--purple); border: 1px solid rgba(168,85,247,0.2); }
+.tag.g { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+
+/* ─── FEATURES (BENTO) ───────────────────────── */
+#features { background: var(--bg); }
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 100px;
+  gap: 1.25rem;
+  margin-top: 3.5rem;
+}
+.bento-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.4s;
+}
+.bento-card:hover { border-color: var(--border2); }
+.b1 { grid-column: span 8; grid-row: span 3; }
+.b2 { grid-column: span 4; grid-row: span 3; }
+.b3 { grid-column: span 4; grid-row: span 3; }
+.b4 { grid-column: span 4; grid-row: span 3; }
+.b5 { grid-column: span 4; grid-row: span 3; }
+.bento-card .feat-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.bento-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+.bento-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+/* AI Brain Animation */
+.ai-brain {
+  margin-top: 1.5rem;
+  height: 120px;
+  position: relative;
+}
+.neural-node {
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  animation: node-pulse 2s ease infinite;
+}
+@keyframes node-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.7} }
+.neural-svg { width: 100%; height: 100%; }
+/* Progress Rings */
+.ring-container { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.ring-wrap { text-align: center; }
+.ring-wrap span { font-size: 0.7rem; color: var(--muted); }
+.ring { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--bg3); stroke-width: 4; }
+.ring-fill { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 100 100; animation: ring-fill 1.5s ease forwards; }
+@keyframes ring-fill { from { stroke-dashoffset: 100; } }
+/* Code Terminal */
+.terminal {
+  background: #0a0e1a;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  margin-top: 1.25rem;
+  overflow: hidden;
+}
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
+}
+.terminal-bar .dot { width: 10px; height: 10px; border-radius: 50%; }
+.terminal-body { padding: 1rem; font-family: var(--mono); font-size: 0.78rem; line-height: 1.8; }
+.terminal-body .cmd { color: var(--green); }
+.terminal-body .out { color: var(--cyan); }
+.terminal-body .mute { color: var(--dim); }
+.cursor { display: inline-block; width: 8px; height: 14px; background: var(--cyan); animation: blink 1s step-end infinite; vertical-align: middle; }
+/* Globe */
+.globe-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.globe-svg { animation: globe-spin 20s linear infinite; }
+@keyframes globe-spin { from{transform:rotateY(0)} to{transform:rotateY(360deg)} }
+
+/* ─── TIMELINE ───────────────────────────────── */
+#timeline { background: var(--bg2); }
+.timeline {
+  margin-top: 3.5rem;
+  position: relative;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--cyan), var(--purple), transparent);
+  transform: translateX(-50%);
+}
+.tl-item {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin-bottom: 4rem;
+  position: relative;
+}
+.tl-item:nth-child(even) { flex-direction: row-reverse; }
+.tl-content {
+  flex: 1;
+  text-align: right;
+}
+.tl-item:nth-child(even) .tl-content { text-align: left; }
+.tl-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 3px solid var(--bg2);
+  box-shadow: 0 0 20px var(--cyan);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  animation: dot-glow 2s ease infinite;
+}
+.tl-item:nth-child(even) .tl-dot { background: var(--purple); box-shadow: 0 0 20px var(--purple); animation: dot-glow-p 2s ease infinite; }
+@keyframes dot-glow { 0%,100%{box-shadow:0 0 10px var(--cyan)} 50%{box-shadow:0 0 30px var(--cyan), 0 0 60px rgba(0,229,255,0.3)} }
+@keyframes dot-glow-p { 0%,100%{box-shadow:0 0 10px var(--purple)} 50%{box-shadow:0 0 30px var(--purple), 0 0 60px rgba(168,85,247,0.3)} }
+.tl-year {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.tl-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+.tl-desc { font-size: 0.875rem; color: var(--muted); }
+
+/* ─── FACULTY ────────────────────────────────── */
+#faculty { background: var(--bg); }
+.faculty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.faculty-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+.faculty-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  transform: scaleX(0);
+  transition: transform 0.4s;
+}
+.faculty-card:hover::after { transform: scaleX(1); }
+.faculty-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+.faculty-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  position: relative;
+}
+.avatar-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  z-index: -1;
+  animation: avatar-spin 4s linear infinite;
+}
+@keyframes avatar-spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.faculty-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+.faculty-card .role { font-size: 0.8rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.75rem; }
+.faculty-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+.faculty-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--gold);
+}
+
+/* ─── SCHEDULE / TIMETABLE ───────────────────── */
+#schedule { background: var(--bg2); }
+.schedule-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+.schedule-tab {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+.schedule-tab.active { color: var(--cyan); border-color: var(--cyan); }
+.schedule-tab:hover { color: var(--text); }
+.timetable { display: none; }
+.timetable.active { display: block; }
+.tt-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  gap: 2px;
+  background: var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.tt-cell {
+  background: var(--bg);
+  padding: 0.75rem 0.5rem;
+  font-size: 0.78rem;
+  transition: background 0.2s;
+}
+.tt-cell:hover { background: var(--bg3); }
+.tt-header {
+  background: var(--bg3) !important;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.tt-time { color: var(--muted); font-family: var(--mono); }
+.tt-subject {
+  color: var(--text);
+  font-weight: 600;
+}
+.tt-room { color: var(--muted); font-size: 0.7rem; margin-top: 0.2rem; }
+.tt-block {
+  background: rgba(0,229,255,0.08) !important;
+  border-left: 2px solid var(--cyan);
+}
+.tt-block.purple { background: rgba(168,85,247,0.08) !important; border-color: var(--purple); }
+.tt-block.pink { background: rgba(236,72,153,0.08) !important; border-color: var(--pink); }
+.tt-block.gold { background: rgba(245,158,11,0.08) !important; border-color: var(--gold); }
+.tt-block.green { background: rgba(16,185,129,0.08) !important; border-color: var(--green); }
+
+/* ─── STUDENT PORTAL ────────────────────────── */
+#portal { background: var(--bg); }
+.portal-container {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 3rem;
+  min-height: 480px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+.portal-sidebar {
+  background: var(--bg3);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+}
+.portal-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+.portal-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #000;
+}
+.portal-user-name { font-weight: 700; font-size: 0.9rem; }
+.portal-user-id { font-size: 0.75rem; color: var(--muted); }
+.portal-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.portal-nav-item:hover { background: var(--surface); color: var(--text); }
+.portal-nav-item.active { background: rgba(0,229,255,0.1); color: var(--cyan); }
+.portal-content { padding: 2rem; }
+.portal-section { display: none; }
+.portal-section.active { display: block; }
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.portal-stat {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.portal-stat .val {
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.portal-stat .lab { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+.progress-bar-wrap { margin-bottom: 1rem; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.5rem; }
+.progress-label span:last-child { color: var(--cyan); font-weight: 700; }
+.progress-track {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  transition: width 1.5s cubic-bezier(0.22,1,0.36,1);
+}
+.assignments-list { list-style: none; }
+.assignment-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s;
+}
+.assignment-item:hover { border-color: var(--border2); }
+.assign-status {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.assign-status.done { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.assign-status.pending { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.assign-status.due { background: var(--pink); box-shadow: 0 0 8px var(--pink); }
+.assign-title { font-weight: 600; font-size: 0.875rem; }
+.assign-sub { font-size: 0.75rem; color: var(--muted); }
+.assign-due { margin-left: auto; font-size: 0.75rem; color: var(--muted); }
+
+/* ─── ADMISSIONS ─────────────────────────────── */
+#admissions { background: var(--bg2); }
+.form-wrapper {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 640px;
+  margin: 3rem auto 0;
+  position: relative;
+  overflow: hidden;
+}
+.form-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(0,229,255,0.06), transparent 60%);
+  pointer-events: none;
+}
+.form-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 2.5rem;
+}
+.step-node {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  color: var(--muted);
+  background: var(--bg);
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+.step-node.done { background: var(--green); border-color: var(--green); color: #000; }
+.step-node.active { background: linear-gradient(135deg,var(--cyan),var(--purple)); border-color: var(--cyan); color: #000; box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  max-width: 60px;
+}
+.step-line.done { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.form-page { display: none; }
+.form-page.active { display: block; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-group input:focus, .form-group select, .form-group textarea:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+}
+.form-group select { appearance: none; cursor: pointer; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-nav { display: flex; justify-content: space-between; margin-top: 2rem; gap: 1rem; }
+.btn-form {
+  padding: 0.75rem 1.75rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+.btn-form.next {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: #000;
+  margin-left: auto;
+}
+.btn-form.next:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,229,255,0.3); }
+.btn-form.back {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.btn-form.back:hover { color: var(--text); border-color: var(--border2); }
+.form-success {
+  display: none;
+  text-align: center;
+  padding: 2rem 0;
+}
+.success-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: rgba(16,185,129,0.1);
+  border: 2px solid var(--green);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem;
+  animation: bounce-in 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);
+}
+@keyframes bounce-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* ─── TESTIMONIALS ───────────────────────────── */
+#testimonials { background: var(--bg); }
+.testimonials-track-wrap { overflow: hidden; margin-top: 3rem; }
+.testimonials-track {
+  display: flex;
+  gap: 1.5rem;
+  animation: scroll-left 30s linear infinite;
+}
+.testimonials-track:hover { animation-play-state: paused; }
+@keyframes scroll-left { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.testimonial-card {
+  min-width: 320px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+.testimonial-card:hover { border-color: var(--border2); }
+.test-stars { color: var(--gold); margin-bottom: 1rem; font-size: 0.9rem; }
+.test-text { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; font-style: italic; }
+.test-author { display: flex; align-items: center; gap: 0.75rem; }
+.test-avi {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #000;
+}
+.test-author-name { font-weight: 700; font-size: 0.875rem; }
+.test-author-role { font-size: 0.75rem; color: var(--muted); }
+
+/* ─── STATS COUNTER ──────────────────────────── */
+#stats { background: var(--bg2); overflow: hidden; position: relative; }
+.stats-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(0,229,255,0.05) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 50%, rgba(168,85,247,0.05) 0%, transparent 60%);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -2px;
+  line-height: 1;
+  display: block;
+}
+.stat-label { font-size: 0.875rem; color: var(--muted); margin-top: 0.5rem; }
+
+/* ─── EVENTS ─────────────────────────────────── */
+#events { background: var(--bg); }
+.events-list { margin-top: 3rem; }
+.event-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.event-item:hover { border-color: var(--border2); background: var(--bg2); transform: translateX(4px); }
+.event-date {
+  text-align: center;
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+.event-day { font-size: 1.75rem; font-weight: 900; color: var(--cyan); line-height: 1; }
+.event-month { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-top: 0.25rem; }
+.event-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+.event-meta { font-size: 0.8rem; color: var(--muted); }
+.event-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge-live { background: rgba(0,229,255,0.1); color: var(--cyan); border: 1px solid rgba(0,229,255,0.2); }
+.badge-upcoming { background: rgba(168,85,247,0.1); color: var(--purple); border: 1px solid rgba(168,85,247,0.2); }
+.badge-open { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+
+/* ─── FOOTER ─────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 5rem 2rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto 4rem;
+}
+.footer-brand p { font-size: 0.875rem; color: var(--muted); margin-top: 1rem; line-height: 1.7; max-width: 260px; }
+.footer-col h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text); }
+.footer-col a {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--cyan); }
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.social-links { display: flex; gap: 1rem; }
+.social-link {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.social-link:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,0.05); }
+
+/* ─── BACK TO TOP ────────────────────────────── */
+#back-top {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  color: #000;
+  font-size: 1.25rem;
+  z-index: 99;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+#back-top.visible { opacity: 1; transform: translateY(0); }
+#back-top:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,229,255,0.4); }
+
+/* ─── NOTIFICATION TOAST ─────────────────────── */
+#toast {
+  position: fixed;
+  top: 5rem; right: 2rem;
+  background: var(--bg2);
+  border: 1px solid var(--cyan);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  max-width: 320px;
+  z-index: 200;
+  transform: translateX(110%);
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  font-size: 0.875rem;
+  box-shadow: 0 0 40px rgba(0,229,255,0.1);
+}
+#toast.show { transform: translateX(0); }
+.toast-title { font-weight: 700; color: var(--cyan); margin-bottom: 0.25rem; }
+.toast-msg { color: var(--muted); }
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 900px) {
+  .bento { grid-template-columns: 1fr 1fr; }
+  .b1, .b2, .b3, .b4, .b5 { grid-column: span 2; grid-row: span 3; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .timeline::before { left: 20px; }
+  .tl-item { flex-direction: row !important; }
+  .tl-content { text-align: left !important; }
+  .portal-container { grid-template-columns: 1fr; }
+  .portal-sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 1.5rem; }
+}
+@media (max-width: 600px) {
+  nav { padding: 1rem 1.25rem; }
+  .nav-links { display: none; }
+  .nav-ham { display: flex; }
+  .section { padding: 4rem 1.25rem; }
+  .bento { grid-template-columns: 1fr; }
+  .b1, .b2, .b3, .b4, .b5 { grid-column: span 1; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .tt-grid { grid-template-columns: 60px repeat(3, 1fr); }
+  .tt-grid > *:nth-child(5), .tt-grid > *:nth-child(10), .tt-grid > *:nth-child(15), .tt-grid > *:nth-child(20), .tt-grid > *:nth-child(25) { display: none; }
+  .event-item { grid-template-columns: 60px 1fr; }
+  .event-badge { display: none; }
+}
+
+/* ─── LOADING SCREEN ─────────────────────────── */
+#loader {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  transition: opacity 0.6s, visibility 0.6s;
+}
+#loader.hidden { opacity: 0; visibility: hidden; }
+.loader-logo { font-size: 2rem; font-weight: 900; }
+.loader-bar-wrap {
+  width: 200px;
+  height: 3px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  border-radius: 2px;
+  animation: load-bar 2s ease forwards;
+}
+@keyframes load-bar { from{width:0} to{width:100%} }
+.loader-text { font-size: 0.8rem; color: var(--muted); }
+
+/* ─── MOBILE NAV DRAWER ──────────────────────── */
+#mobile-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(4,6,15,0.95);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+#mobile-nav.open { transform: translateX(0); }
+#mobile-nav a { font-size: 1.5rem; font-weight: 700; color: var(--text); transition: color 0.2s; }
+#mobile-nav a:hover { color: var(--cyan); }
+.mobile-close {
+  position: absolute;
+  top: 1.5rem; right: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.mobile-close:hover { color: var(--text); }
+
+/* ─── CURSOR GLOW ────────────────────────────── */
+#cursor-glow {
+  position: fixed;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,229,255,0.06), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+  transition: left 0.1s ease, top 0.1s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR GLOW -->
+<div id="cursor-glow"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">
+    <span style="background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">NexaLearn</span>
+  </div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-text">Initializing Learning Matrix...</div>
+</div>
+
+<!-- STAR FIELD CANVAS -->
+<canvas id="starfield"></canvas>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast">
+  <div class="toast-title" id="toast-title">Notification</div>
+  <div class="toast-msg" id="toast-msg">Message</div>
+</div>
+
+<!-- BACK TO TOP -->
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
+<!-- MOBILE NAV -->
+<div id="mobile-nav">
+  <span class="mobile-close" onclick="toggleMobileNav()">✕</span>
+  <a href="#programs" onclick="toggleMobileNav()">Programs</a>
+  <a href="#features" onclick="toggleMobileNav()">Features</a>
+  <a href="#faculty" onclick="toggleMobileNav()">Faculty</a>
+  <a href="#schedule" onclick="toggleMobileNav()">Schedule</a>
+  <a href="#portal" onclick="toggleMobileNav()">Portal</a>
+  <a href="#admissions" onclick="toggleMobileNav()">Admissions</a>
+  <a href="#events" onclick="toggleMobileNav()">Events</a>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="main-nav">
+  <div class="nav-logo">
+    <div class="logo-icon">🎓</div>
+    <span>NexaLearn</span>
+  </div>
+  <div class="nav-links">
+    <a href="#programs">Programs</a>
+    <a href="#features">Features</a>
+    <a href="#faculty">Faculty</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#portal">Portal</a>
+    <a href="#admissions">Admissions</a>
+    <a href="#events">Events</a>
+  </div>
+  <button class="nav-cta" onclick="scrollTo('#admissions')">Apply Now</button>
+  <div class="nav-ham" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- HERO                                       -->
+<!-- ══════════════════════════════════════════ -->
+<section id="hero">
+  <canvas class="particles-canvas" id="particles"></canvas>
+  <div class="hero-ring"></div>
+  <div class="hero-ring"></div>
+  <div class="hero-ring"></div>
+  <div class="hero-ring"></div>
+
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Applications Open for 2026–27
+  </div>
+
+  <h1 class="hero-title">
+    <span class="line1">Education for</span>
+    <span class="line2">The Age of Intelligence</span>
+  </h1>
+
+  <p class="hero-sub">NexaLearn Academy merges AI-powered pedagogy, quantum curriculum design, and immersive holographic labs — building tomorrow's innovators today.</p>
+
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="scrollTo('#admissions')">Begin Your Journey</button>
+    <button class="btn-outline" onclick="scrollTo('#programs')">Explore Programs</button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat"><strong id="c-students">0</strong><span>Students Enrolled</span></div>
+    <div class="hero-stat"><strong id="c-programs">0</strong><span>Active Programs</span></div>
+    <div class="hero-stat"><strong id="c-alumni">0</strong><span>Alumni Worldwide</span></div>
+    <div class="hero-stat"><strong id="c-rating">0</strong><span>Satisfaction Rate</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PROGRAMS                                   -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="programs">
+  <div class="section-inner">
+    <span class="section-label reveal">Academic Programs</span>
+    <h2 class="section-title reveal">Curriculum Built for <span class="grad">Tomorrow</span></h2>
+    <p class="section-sub reveal">Every program integrates AI mentorship, real-world projects, and adaptive learning paths personalized to each student's neural profile.</p>
+    <div class="programs-grid">
+      <div class="program-card reveal" data-color="#00e5ff">
+        <div class="prog-icon cyan">🤖</div>
+        <div class="prog-tags"><span class="tag c">AI Core</span><span class="tag g">Hands-on</span></div>
+        <h3>Artificial Intelligence & Robotics</h3>
+        <p>Master machine learning, neural architecture design, and autonomous systems through project-based learning with live AI systems.</p>
+        <div class="prog-meta">
+          <span>⏱ 4 Years</span>
+          <span>🧑‍💻 320 Seats</span>
+          <span>🌐 Hybrid</span>
+        </div>
+      </div>
+      <div class="program-card reveal" style="transition-delay:0.1s">
+        <div class="prog-icon purple">⚛️</div>
+        <div class="prog-tags"><span class="tag p">Frontier</span><span class="tag c">Research</span></div>
+        <h3>Quantum Computing & Physics</h3>
+        <p>Explore quantum entanglement, superposition algorithms, and next-generation cryptography in partnership with leading quantum labs.</p>
+        <div class="prog-meta">
+          <span>⏱ 4 Years</span>
+          <span>🧑‍💻 120 Seats</span>
+          <span>🌐 On-Campus</span>
+        </div>
+      </div>
+      <div class="program-card reveal" style="transition-delay:0.2s">
+        <div class="prog-icon pink">🧬</div>
+        <div class="prog-tags"><span class="tag c">BioTech</span><span class="tag p">Lab</span></div>
+        <h3>BioTech & Genetic Engineering</h3>
+        <p>Gene editing, synthetic biology, and bioinformatics with access to CRISPR labs and computational genomics platforms.</p>
+        <div class="prog-meta">
+          <span>⏱ 5 Years</span>
+          <span>🧑‍💻 180 Seats</span>
+          <span>🌐 On-Campus</span>
+        </div>
+      </div>
+      <div class="program-card reveal" style="transition-delay:0.3s">
+        <div class="prog-icon gold">🌍</div>
+        <div class="prog-tags"><span class="tag g">Impact</span><span class="tag c">Policy</span></div>
+        <h3>Climate Tech & Sustainability</h3>
+        <p>Renewable energy systems, carbon capture engineering, and eco-policy design — solving the planet's most urgent problems.</p>
+        <div class="prog-meta">
+          <span>⏱ 3 Years</span>
+          <span>🧑‍💻 240 Seats</span>
+          <span>🌐 Hybrid</span>
+        </div>
+      </div>
+      <div class="program-card reveal" style="transition-delay:0.4s">
+        <div class="prog-icon green">🚀</div>
+        <div class="prog-tags"><span class="tag p">Space</span><span class="tag g">STEM</span></div>
+        <h3>Space Systems & Astrophysics</h3>
+        <p>Orbital mechanics, satellite engineering, and deep-space mission planning with simulation access to real mission data.</p>
+        <div class="prog-meta">
+          <span>⏱ 4 Years</span>
+          <span>🧑‍💻 160 Seats</span>
+          <span>🌐 On-Campus</span>
+        </div>
+      </div>
+      <div class="program-card reveal" style="transition-delay:0.5s">
+        <div class="prog-icon cyan">🎨</div>
+        <div class="prog-tags"><span class="tag c">Creative</span><span class="tag g">Digital</span></div>
+        <h3>Digital Arts & Immersive Design</h3>
+        <p>VR/AR world-building, generative art, and holographic experience design using professional-grade creative suites.</p>
+        <div class="prog-meta">
+          <span>⏱ 3 Years</span>
+          <span>🧑‍💻 200 Seats</span>
+          <span>🌐 Hybrid</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FEATURES (BENTO)                           -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <span class="section-label reveal">Why NexaLearn</span>
+    <h2 class="section-title reveal">Technology Meets <span class="grad">Pedagogy</span></h2>
+    <div class="bento">
+
+      <!-- B1: AI Tutor — Large -->
+      <div class="bento-card b1 reveal">
+        <div class="feat-icon">🧠</div>
+        <h3>Neural Learning Engine</h3>
+        <p>Our proprietary AI adapts every lesson in real-time to each student's cognitive pattern, knowledge gaps, and optimal learning time windows.</p>
+        <div class="ai-brain" id="neural-viz"></div>
+      </div>
+
+      <!-- B2: Progress -->
+      <div class="bento-card b2 reveal" style="transition-delay:0.1s">
+        <div class="feat-icon">📊</div>
+        <h3>Live Performance Analytics</h3>
+        <p>360° skill mapping with real-time competency rings.</p>
+        <div class="ring-container" id="ring-container"></div>
+      </div>
+
+      <!-- B3: Terminal -->
+      <div class="bento-card b3 reveal" style="transition-delay:0.2s">
+        <div class="feat-icon">💻</div>
+        <h3>Cloud Dev Environment</h3>
+        <p>Instant coding labs in 40+ languages.</p>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="dot" style="background:#ff5f57"></div>
+            <div class="dot" style="background:#febc2e"></div>
+            <div class="dot" style="background:#28c840"></div>
+            <span style="margin-left:0.5rem;font-size:0.7rem;color:var(--muted)">nexa-terminal</span>
+          </div>
+          <div class="terminal-body" id="terminal-body">
+            <div class="mute">// NexaLearn Cloud Shell v4.2</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B4: Global -->
+      <div class="bento-card b4 reveal" style="transition-delay:0.3s">
+        <div class="feat-icon">🌐</div>
+        <h3>Global Campus Network</h3>
+        <p>Connected to 140+ institutions across 60 countries.</p>
+        <div class="globe-wrap">
+          <svg class="globe-svg" width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(0,229,255,0.15)" stroke-width="1"/>
+            <ellipse cx="60" cy="60" rx="20" ry="50" fill="none" stroke="rgba(0,229,255,0.1)" stroke-width="1"/>
+            <ellipse cx="60" cy="60" rx="50" ry="20" fill="none" stroke="rgba(0,229,255,0.1)" stroke-width="1"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(168,85,247,0.15)" stroke-width="0.5" stroke-dasharray="4 6"/>
+            <circle cx="30" cy="45" r="3" fill="var(--cyan)" opacity="0.8"/>
+            <circle cx="85" cy="30" r="2.5" fill="var(--purple)" opacity="0.8"/>
+            <circle cx="75" cy="70" r="2" fill="var(--pink)" opacity="0.8"/>
+            <circle cx="40" cy="75" r="2.5" fill="var(--green)" opacity="0.8"/>
+            <circle cx="60" cy="50" r="3" fill="var(--gold)" opacity="0.8"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- B5: VR Lab -->
+      <div class="bento-card b5 reveal" style="transition-delay:0.4s">
+        <div class="feat-icon">🥽</div>
+        <h3>Holographic Labs</h3>
+        <p>Dissect a star, walk inside DNA, explore ancient civilizations in full immersive 3D.</p>
+        <div style="margin-top:1.25rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <span class="tag c">VR Labs</span>
+          <span class="tag p">AR Overlay</span>
+          <span class="tag g">Holodecks</span>
+        </div>
+        <div style="margin-top:1.25rem;font-size:0.78rem;color:var(--muted)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem"><span>Biology Lab</span><span style="color:var(--green)">Online</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem"><span>Physics Sim</span><span style="color:var(--cyan)">Online</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Chem Reactor</span><span style="color:var(--gold)">Booting...</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TIMELINE                                   -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="timeline">
+  <div class="section-inner">
+    <span class="section-label reveal">Our Journey</span>
+    <h2 class="section-title reveal">From Vision to <span class="grad">Reality</span></h2>
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-content">
+          <div class="tl-year">2018</div>
+          <div class="tl-title">Founded in Silicon Valley</div>
+          <div class="tl-desc">A team of 12 educators and engineers launched NexaLearn with a bold mission: to reinvent formal education using AI and immersive technology.</div>
+        </div>
+        <div class="tl-dot"></div>
+        <div style="flex:1"></div>
+      </div>
+      <div class="tl-item reveal" style="transition-delay:0.1s">
+        <div style="flex:1"></div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-year">2020</div>
+          <div class="tl-title">First AI Curriculum Launch</div>
+          <div class="tl-desc">Deployed the world's first adaptive neural curriculum engine, personalizing learning for 2,000+ early students across 3 pilot programs.</div>
+        </div>
+      </div>
+      <div class="tl-item reveal" style="transition-delay:0.2s">
+        <div class="tl-content">
+          <div class="tl-year">2022</div>
+          <div class="tl-title">Holographic Labs Open</div>
+          <div class="tl-desc">Inaugurated 48 holographic learning pods, enabling immersive VR/AR lab sessions that replaced traditional textbooks for Science and Engineering.</div>
+        </div>
+        <div class="tl-dot"></div>
+        <div style="flex:1"></div>
+      </div>
+      <div class="tl-item reveal" style="transition-delay:0.3s">
+        <div style="flex:1"></div>
+        <div class="tl-dot"></div>
+        <div class="tl-content">
+          <div class="tl-year">2024</div>
+          <div class="tl-title">Global Network Expansion</div>
+          <div class="tl-desc">Reached 50,000 students across 60 countries, partnering with MIT, CERN, NASA, and 140 leading research institutions worldwide.</div>
+        </div>
+      </div>
+      <div class="tl-item reveal" style="transition-delay:0.4s">
+        <div class="tl-content">
+          <div class="tl-year">2026</div>
+          <div class="tl-title">Quantum Learning Initiative</div>
+          <div class="tl-desc">Launched the world's first Quantum Computing curriculum for secondary students, giving them access to real quantum processors through cloud integration.</div>
+        </div>
+        <div class="tl-dot"></div>
+        <div style="flex:1"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FACULTY                                    -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="faculty">
+  <div class="section-inner">
+    <span class="section-label reveal">Our Educators</span>
+    <h2 class="section-title reveal">World-Class <span class="grad">Faculty</span></h2>
+    <p class="section-sub reveal">Former NASA scientists, Google engineers, Nobel laureates, and TED speakers — all united by one mission.</p>
+    <div class="faculty-grid">
+      <div class="faculty-card reveal">
+        <div class="faculty-avatar" style="background:rgba(0,229,255,0.1)">
+          <div class="avatar-ring" style="background:linear-gradient(135deg,var(--cyan),var(--purple))"></div>
+          🧑‍🔬
+        </div>
+        <h3>Dr. Aria Voss</h3>
+        <div class="role">Head of AI Research</div>
+        <p>Former Google DeepMind researcher, PhD MIT. Pioneered the Neural Adaptive Learning Engine used campus-wide.</p>
+        <div class="faculty-rating">★★★★★ <span style="color:var(--muted)">4.97 · 1,240 reviews</span></div>
+      </div>
+      <div class="faculty-card reveal" style="transition-delay:0.1s">
+        <div class="faculty-avatar" style="background:rgba(168,85,247,0.1)">
+          <div class="avatar-ring" style="background:linear-gradient(135deg,var(--purple),var(--pink))"></div>
+          👨‍🚀
+        </div>
+        <h3>Prof. Zane Okoro</h3>
+        <div class="role" style="color:var(--purple)">Astrophysics Chair</div>
+        <p>Ex-NASA Jet Propulsion Lab engineer with 3 patents in orbital mechanics. Led the Mars Habitat Design project.</p>
+        <div class="faculty-rating">★★★★★ <span style="color:var(--muted)">4.94 · 890 reviews</span></div>
+      </div>
+      <div class="faculty-card reveal" style="transition-delay:0.2s">
+        <div class="faculty-avatar" style="background:rgba(236,72,153,0.1)">
+          <div class="avatar-ring" style="background:linear-gradient(135deg,var(--pink),var(--gold))"></div>
+          👩‍⚕️
+        </div>
+        <h3>Dr. Leila Nakamura</h3>
+        <div class="role" style="color:var(--pink)">BioTech Director</div>
+        <p>Nobel Prize nominee in CRISPR gene therapy research. Published author of 47 peer-reviewed papers in synthetic biology.</p>
+        <div class="faculty-rating">★★★★★ <span style="color:var(--muted)">4.98 · 2,100 reviews</span></div>
+      </div>
+      <div class="faculty-card reveal" style="transition-delay:0.3s">
+        <div class="faculty-avatar" style="background:rgba(245,158,11,0.1)">
+          <div class="avatar-ring" style="background:linear-gradient(135deg,var(--gold),var(--green))"></div>
+          🧑‍💻
+        </div>
+        <h3>Prof. Ravi Chen</h3>
+        <div class="role" style="color:var(--gold)">Quantum Computing Lead</div>
+        <p>PhD Caltech, co-inventor of the QubitFlux algorithm. TED speaker with 18M+ views on the future of quantum education.</p>
+        <div class="faculty-rating">★★★★★ <span style="color:var(--muted)">4.96 · 3,400 reviews</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCHEDULE / TIMETABLE                       -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="schedule">
+  <div class="section-inner">
+    <span class="section-label reveal">Class Schedule</span>
+    <h2 class="section-title reveal">Your Week at <span class="grad">NexaLearn</span></h2>
+    <div class="reveal">
+      <div class="schedule-tabs">
+        <button class="schedule-tab active" onclick="switchTab(this,'tt-ai')">AI & Robotics</button>
+        <button class="schedule-tab" onclick="switchTab(this,'tt-quantum')">Quantum Physics</button>
+        <button class="schedule-tab" onclick="switchTab(this,'tt-bio')">BioTech</button>
+      </div>
+
+      <div class="timetable active" id="tt-ai">
+        <div class="tt-grid">
+          <div class="tt-cell tt-header"></div>
+          <div class="tt-cell tt-header">Monday</div>
+          <div class="tt-cell tt-header">Tuesday</div>
+          <div class="tt-cell tt-header">Wednesday</div>
+          <div class="tt-cell tt-header">Thursday</div>
+          <div class="tt-cell tt-header">Friday</div>
+
+          <div class="tt-cell tt-time">8:00–10:00</div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Neural Networks</div><div class="tt-room">🏛 Lab A-12</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block purple"><div class="tt-subject">Deep Learning</div><div class="tt-room">🏛 Lab A-12</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block green"><div class="tt-subject">Project Lab</div><div class="tt-room">🏛 Studio B</div></div>
+
+          <div class="tt-cell tt-time">10:30–12:30</div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block pink"><div class="tt-subject">Robotics</div><div class="tt-room">🏛 Robotics Hall</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block gold"><div class="tt-subject">Computer Vision</div><div class="tt-room">🏛 Lab A-12</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+
+          <div class="tt-cell tt-time">14:00–16:00</div>
+          <div class="tt-cell tt-block purple"><div class="tt-subject">Mathematics</div><div class="tt-room">🏛 Room 204</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">NLP</div><div class="tt-room">🏛 Lab A-12</div></div>
+          <div class="tt-cell tt-block gold"><div class="tt-subject">Ethics in AI</div><div class="tt-room">🏛 Forum</div></div>
+          <div class="tt-cell tt-block green"><div class="tt-subject">Hackathon</div><div class="tt-room">🏛 Hub Floor</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+
+          <div class="tt-cell tt-time">16:30–18:00</div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block pink"><div class="tt-subject">AI Seminar</div><div class="tt-room">🏛 Auditorium</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Research</div><div class="tt-room">🏛 Lab A-12</div></div>
+        </div>
+      </div>
+
+      <div class="timetable" id="tt-quantum">
+        <div class="tt-grid">
+          <div class="tt-cell tt-header"></div>
+          <div class="tt-cell tt-header">Monday</div>
+          <div class="tt-cell tt-header">Tuesday</div>
+          <div class="tt-cell tt-header">Wednesday</div>
+          <div class="tt-cell tt-header">Thursday</div>
+          <div class="tt-cell tt-header">Friday</div>
+          <div class="tt-cell tt-time">8:00–10:00</div>
+          <div class="tt-cell tt-block purple"><div class="tt-subject">Quantum Mechanics</div><div class="tt-room">🏛 Physics Wing</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Wave Theory</div><div class="tt-room">🏛 Lab Q-01</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block green"><div class="tt-subject">Qubit Lab</div><div class="tt-room">🏛 Q-Lab</div></div>
+          <div class="tt-cell tt-time">10:30–12:30</div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Superposition</div><div class="tt-room">🏛 Lab Q-01</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block purple"><div class="tt-subject">Cryptography</div><div class="tt-room">🏛 Cyber Hub</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-time">14:00–16:00</div>
+          <div class="tt-cell tt-block gold"><div class="tt-subject">Advanced Math</div><div class="tt-room">🏛 Room 301</div></div>
+          <div class="tt-cell tt-block pink"><div class="tt-subject">Algorithm Design</div><div class="tt-room">🏛 Lab Q-01</div></div>
+          <div class="tt-cell tt-block gold"><div class="tt-subject">Quantum Ethics</div><div class="tt-room">🏛 Forum</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Research Proj.</div><div class="tt-room">🏛 Q-Lab</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+        </div>
+      </div>
+
+      <div class="timetable" id="tt-bio">
+        <div class="tt-grid">
+          <div class="tt-cell tt-header"></div>
+          <div class="tt-cell tt-header">Monday</div>
+          <div class="tt-cell tt-header">Tuesday</div>
+          <div class="tt-cell tt-header">Wednesday</div>
+          <div class="tt-cell tt-header">Thursday</div>
+          <div class="tt-cell tt-header">Friday</div>
+          <div class="tt-cell tt-time">8:00–10:00</div>
+          <div class="tt-cell tt-block green"><div class="tt-subject">Genomics</div><div class="tt-room">🏛 Bio Lab B</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block pink"><div class="tt-subject">CRISPR Lab</div><div class="tt-room">🏛 Gene Lab</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Bioinformatics</div><div class="tt-room">🏛 Data Lab</div></div>
+          <div class="tt-cell tt-time">10:30–12:30</div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Cell Biology</div><div class="tt-room">🏛 Bio Lab B</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-block purple"><div class="tt-subject">Protein Design</div><div class="tt-room">🏛 Synth Lab</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+          <div class="tt-cell tt-time">14:00–16:00</div>
+          <div class="tt-cell tt-block gold"><div class="tt-subject">BioEthics</div><div class="tt-room">🏛 Forum</div></div>
+          <div class="tt-cell tt-block green"><div class="tt-subject">Synthetic Bio</div><div class="tt-room">🏛 Synth Lab</div></div>
+          <div class="tt-cell tt-block"><div class="tt-subject">Research</div><div class="tt-room">🏛 Gene Lab</div></div>
+          <div class="tt-cell tt-block pink"><div class="tt-subject">VR Anatomy</div><div class="tt-room">🏛 Holo Lab</div></div>
+          <div class="tt-cell"><div class="tt-subject" style="color:var(--muted)">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- STUDENT PORTAL (SIMULATED BACKEND)         -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="portal">
+  <div class="section-inner">
+    <span class="section-label reveal">Student Dashboard</span>
+    <h2 class="section-title reveal">Your Academic <span class="grad">Command Center</span></h2>
+    <div class="portal-container reveal">
+      <div class="portal-sidebar">
+        <div class="portal-user">
+          <div class="portal-avatar">AK</div>
+          <div>
+            <div class="portal-user-name">Arjun Kumar</div>
+            <div class="portal-user-id">NX-2026-0471</div>
+          </div>
+        </div>
+        <div class="portal-nav-item active" onclick="switchPortal(this,'dash')">📊 Dashboard</div>
+        <div class="portal-nav-item" onclick="switchPortal(this,'courses')">📚 My Courses</div>
+        <div class="portal-nav-item" onclick="switchPortal(this,'assignments')">📝 Assignments</div>
+        <div class="portal-nav-item" onclick="switchPortal(this,'grades')">🎯 Grades</div>
+        <div class="portal-nav-item" onclick="switchPortal(this,'ai-tutor')" style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem">🤖 AI Tutor</div>
+        <div class="portal-nav-item" onclick="showToast('Settings panel launching soon!','⚙️ Portal Settings')">⚙️ Settings</div>
+      </div>
+      <div class="portal-content">
+        <!-- DASHBOARD -->
+        <div class="portal-section active" id="dash">
+          <h3 style="font-size:1.1rem;margin-bottom:1.25rem">Welcome back, Arjun 👋</h3>
+          <div class="portal-grid">
+            <div class="portal-stat"><div class="val">3.87</div><div class="lab">GPA Score</div></div>
+            <div class="portal-stat"><div class="val">94%</div><div class="lab">Attendance</div></div>
+            <div class="portal-stat"><div class="val">6</div><div class="lab">Active Courses</div></div>
+            <div class="portal-stat"><div class="val">12</div><div class="lab">Pending Tasks</div></div>
+          </div>
+          <div style="margin-top:0.5rem">
+            <div style="font-size:0.85rem;font-weight:700;margin-bottom:1rem">📈 Skill Progress</div>
+            <div class="progress-bar-wrap"><div class="progress-label"><span>Machine Learning</span><span>87%</span></div><div class="progress-track"><div class="progress-fill" style="width:87%"></div></div></div>
+            <div class="progress-bar-wrap"><div class="progress-label"><span>Python Programming</span><span>92%</span></div><div class="progress-track"><div class="progress-fill" style="width:92%;background:linear-gradient(90deg,var(--purple),var(--pink))"></div></div></div>
+            <div class="progress-bar-wrap"><div class="progress-label"><span>Neural Networks</span><span>74%</span></div><div class="progress-track"><div class="progress-fill" style="width:74%;background:linear-gradient(90deg,var(--gold),var(--pink))"></div></div></div>
+            <div class="progress-bar-wrap"><div class="progress-label"><span>Data Science</span><span>80%</span></div><div class="progress-track"><div class="progress-fill" style="width:80%;background:linear-gradient(90deg,var(--green),var(--cyan))"></div></div></div>
+          </div>
+        </div>
+        <!-- COURSES -->
+        <div class="portal-section" id="courses">
+          <h3 style="font-size:1.1rem;margin-bottom:1.25rem">📚 Enrolled Courses</h3>
+          <div id="courses-list"></div>
+        </div>
+        <!-- ASSIGNMENTS -->
+        <div class="portal-section" id="assignments">
+          <h3 style="font-size:1.1rem;margin-bottom:1.25rem">📝 Assignments</h3>
+          <ul class="assignments-list" id="assignments-list"></ul>
+        </div>
+        <!-- GRADES -->
+        <div class="portal-section" id="grades">
+          <h3 style="font-size:1.1rem;margin-bottom:1.25rem">🎯 Grade Report</h3>
+          <div id="grades-list"></div>
+        </div>
+        <!-- AI TUTOR -->
+        <div class="portal-section" id="ai-tutor">
+          <h3 style="font-size:1.1rem;margin-bottom:1.25rem">🤖 AI Tutor — Nexa</h3>
+          <div id="chat-messages" style="height:260px;overflow-y:auto;background:var(--bg3);border-radius:10px;padding:1rem;margin-bottom:1rem;display:flex;flex-direction:column;gap:0.75rem;"></div>
+          <div style="display:flex;gap:0.75rem">
+            <input id="chat-input" type="text" placeholder="Ask Nexa anything..." style="flex:1" onkeydown="if(event.key==='Enter')sendChat()" />
+            <button onclick="sendChat()" style="padding:0.75rem 1.25rem;background:linear-gradient(135deg,var(--cyan),var(--purple));color:#000;font-weight:700;border-radius:10px;font-size:0.875rem">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- STATISTICS                                 -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="stats">
+  <div class="stats-bg"></div>
+  <div class="section-inner">
+    <div class="stats-grid">
+      <div class="stat-item reveal"><span class="stat-num" data-target="50000" data-suffix="+" id="sn1">0</span><div class="stat-label">Active Students</div></div>
+      <div class="stat-item reveal" style="transition-delay:0.1s"><span class="stat-num" data-target="140" data-suffix="+" id="sn2">0</span><div class="stat-label">Partner Institutions</div></div>
+      <div class="stat-item reveal" style="transition-delay:0.2s"><span class="stat-num" data-target="98" data-suffix="%" id="sn3">0</span><div class="stat-label">Placement Rate</div></div>
+      <div class="stat-item reveal" style="transition-delay:0.3s"><span class="stat-num" data-target="60" data-suffix="+" id="sn4">0</span><div class="stat-label">Countries Reached</div></div>
+      <div class="stat-item reveal" style="transition-delay:0.4s"><span class="stat-num" data-target="4.9" data-suffix="★" id="sn5">0</span><div class="stat-label">Average Rating</div></div>
+      <div class="stat-item reveal" style="transition-delay:0.5s"><span class="stat-num" data-target="200" data-suffix="k" id="sn6">0</span><div class="stat-label">Alumni Network</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ADMISSIONS (MULTI-STEP FORM)               -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="admissions">
+  <div class="section-inner">
+    <span class="section-label reveal">Admissions 2026</span>
+    <h2 class="section-title reveal" style="text-align:center">Start Your <span class="grad">Application</span></h2>
+    <p class="section-sub reveal" style="text-align:center;margin:0 auto">Three steps to joining the next generation of world-changers. Applications close August 31, 2026.</p>
+
+    <div class="form-wrapper reveal">
+      <div class="form-steps">
+        <div class="step-node active" id="sn-1">1</div>
+        <div class="step-line" id="sl-1"></div>
+        <div class="step-node" id="sn-2">2</div>
+        <div class="step-line" id="sl-2"></div>
+        <div class="step-node" id="sn-3">3</div>
+      </div>
+
+      <!-- PAGE 1 -->
+      <div class="form-page active" id="fp-1">
+        <div style="font-size:0.9rem;font-weight:700;margin-bottom:1.5rem;color:var(--muted)">Step 1 of 3 — Personal Information</div>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" placeholder="Arjun" id="f-fname"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" placeholder="Kumar" id="f-lname"></div>
+        </div>
+        <div class="form-group"><label>Email Address</label><input type="email" placeholder="arjun@example.com" id="f-email"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Date of Birth</label><input type="date" id="f-dob"></div>
+          <div class="form-group"><label>Country</label><select id="f-country"><option>India</option><option>USA</option><option>UK</option><option>Germany</option><option>Japan</option><option>Singapore</option><option>Other</option></select></div>
+        </div>
+        <div class="form-nav"><button class="btn-form next" onclick="nextStep(2)">Continue →</button></div>
+      </div>
+
+      <!-- PAGE 2 -->
+      <div class="form-page" id="fp-2">
+        <div style="font-size:0.9rem;font-weight:700;margin-bottom:1.5rem;color:var(--muted)">Step 2 of 3 — Academic Background</div>
+        <div class="form-group"><label>Desired Program</label>
+          <select id="f-program">
+            <option>Artificial Intelligence & Robotics</option>
+            <option>Quantum Computing & Physics</option>
+            <option>BioTech & Genetic Engineering</option>
+            <option>Climate Tech & Sustainability</option>
+            <option>Space Systems & Astrophysics</option>
+            <option>Digital Arts & Immersive Design</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Previous School</label><input type="text" placeholder="School name" id="f-school"></div>
+          <div class="form-group"><label>Academic Score (%)</label><input type="number" min="0" max="100" placeholder="92" id="f-score"></div>
+        </div>
+        <div class="form-group"><label>Why NexaLearn? (Brief Statement)</label>
+          <textarea rows="3" placeholder="Describe your motivation..." id="f-statement" style="resize:vertical"></textarea>
+        </div>
+        <div class="form-nav">
+          <button class="btn-form back" onclick="nextStep(1)">← Back</button>
+          <button class="btn-form next" onclick="nextStep(3)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- PAGE 3 -->
+      <div class="form-page" id="fp-3">
+        <div style="font-size:0.9rem;font-weight:700;margin-bottom:1.5rem;color:var(--muted)">Step 3 of 3 — Review & Submit</div>
+        <div id="review-content" style="background:var(--bg2);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;font-size:0.875rem;line-height:2"></div>
+        <div class="form-group" style="display:flex;align-items:flex-start;gap:0.75rem">
+          <input type="checkbox" id="agree" style="width:18px;height:18px;margin-top:2px;flex-shrink:0">
+          <label for="agree" style="margin:0;cursor:pointer;font-weight:400;color:var(--muted)">I confirm all information is accurate and agree to the NexaLearn <span style="color:var(--cyan)">Terms & Conditions</span> and <span style="color:var(--cyan)">Privacy Policy</span>.</label>
+        </div>
+        <div class="form-nav">
+          <button class="btn-form back" onclick="nextStep(2)">← Back</button>
+          <button class="btn-form next" onclick="submitForm()">Submit Application 🚀</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="form-success" id="form-success">
+        <div class="success-icon">✅</div>
+        <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:0.75rem">Application Received!</h3>
+        <p style="color:var(--muted);max-width:360px;margin:0 auto 1.5rem">Your application ID is <strong style="color:var(--cyan)" id="app-id">NX-0000</strong>. Our admissions team will contact you within 5 business days.</p>
+        <button class="btn-primary" onclick="resetForm()">Submit Another</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TESTIMONIALS                               -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="testimonials" style="overflow:hidden;padding-bottom:5rem">
+  <div class="section-inner">
+    <span class="section-label reveal">Student Stories</span>
+    <h2 class="section-title reveal">Voices of <span class="grad">Tomorrow</span></h2>
+  </div>
+  <div class="testimonials-track-wrap" style="margin-top:3rem">
+    <div class="testimonials-track" id="testimonials-track"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- EVENTS                                     -->
+<!-- ══════════════════════════════════════════ -->
+<section class="section" id="events">
+  <div class="section-inner">
+    <span class="section-label reveal">What's On</span>
+    <h2 class="section-title reveal">Upcoming <span class="grad">Events</span></h2>
+    <div class="events-list reveal">
+      <div class="event-item" onclick="showToast('Registration opened!','🎉 NexaLearn Hackathon 2026')">
+        <div class="event-date"><div class="event-day">18</div><div class="event-month">Jul</div></div>
+        <div><div class="event-title">Global AI Hackathon 2026</div><div class="event-meta">🌐 Virtual + On-Campus · 48 hours · All Programs</div></div>
+        <span class="event-badge badge-open">Registration Open</span>
+      </div>
+      <div class="event-item" onclick="showToast('Webinar link sent to your email!','🎓 Open Campus Day')">
+        <div class="event-date"><div class="event-day">25</div><div class="event-month">Jul</div></div>
+        <div><div class="event-title">Open Campus Day — Virtual Tour</div><div class="event-meta">🏛 Holographic Campus · 10:00 AM IST · All Prospective Students</div></div>
+        <span class="event-badge badge-upcoming">Upcoming</span>
+      </div>
+      <div class="event-item" onclick="showToast('Talk is live now!','🎤 Dr. Aria Voss — AI Lecture')">
+        <div class="event-date"><div class="event-day">14</div><div class="event-month">Jun</div></div>
+        <div><div class="event-title">AI & The Human Mind — Dr. Aria Voss</div><div class="event-meta">🎤 Auditorium Alpha · Right Now · NX Faculty Series</div></div>
+        <span class="event-badge badge-live">🔴 Live</span>
+      </div>
+      <div class="event-item" onclick="showToast('Application deadline approaching!','📋 Admissions Deadline')">
+        <div class="event-date"><div class="event-day">31</div><div class="event-month">Aug</div></div>
+        <div><div class="event-title">2026–27 Admissions Deadline</div><div class="event-meta">📋 Online · All Programs · Last day to apply</div></div>
+        <span class="event-badge badge-upcoming">79 Days Left</span>
+      </div>
+      <div class="event-item" onclick="showToast('See you on Mars!','🚀 Space Simulation')">
+        <div class="event-date"><div class="event-day">08</div><div class="event-month">Aug</div></div>
+        <div><div class="event-title">Mars Habitat VR Simulation Sprint</div><div class="event-meta">🥽 Holographic Lab 3 · 9:00 AM – 6:00 PM · Space Program</div></div>
+        <span class="event-badge badge-upcoming">Upcoming</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- FOOTER                                     -->
+<!-- ══════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo" style="margin-bottom:0.5rem">
+        <div class="logo-icon">🎓</div>
+        <span>NexaLearn</span>
+      </div>
+      <p>Shaping the architects of tomorrow through AI-powered, immersive, and hyper-personalized education. Changing the world, one mind at a time.</p>
+      <div class="social-links" style="margin-top:1.5rem">
+        <a class="social-link" href="#">𝕏</a>
+        <a class="social-link" href="#">in</a>
+        <a class="social-link" href="#">yt</a>
+        <a class="social-link" href="#">ig</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Programs</h4>
+      <a href="#">AI & Robotics</a>
+      <a href="#">Quantum Physics</a>
+      <a href="#">BioTech</a>
+      <a href="#">Climate Tech</a>
+      <a href="#">Space Systems</a>
+      <a href="#">Digital Arts</a>
+    </div>
+    <div class="footer-col">
+      <h4>Campus</h4>
+      <a href="#">Holographic Labs</a>
+      <a href="#">Research Centers</a>
+      <a href="#">Innovation Hub</a>
+      <a href="#">Student Housing</a>
+      <a href="#">Sports Complex</a>
+      <a href="#">Virtual Campus</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">Admissions Help</a>
+      <a href="#">Scholarships</a>
+      <a href="#">Student Portal</a>
+      <a href="#">Alumni Network</a>
+      <a href="#">Career Services</a>
+      <a href="#">Contact Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 NexaLearn Academy Inc. All rights reserved.</span>
+    <span>Ranked #1 Futuristic Institution — Global Education Index 2026</span>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- JAVASCRIPT — ALL LOGIC                     -->
+<!-- ══════════════════════════════════════════ -->
+<script>
+/* ── SIMULATED BACKEND DATA STORE ───────────── */
+const DB = {
+  courses: [
+    { id:'NX-ML-101', name:'Machine Learning Fundamentals', instructor:'Dr. Aria Voss', progress:87, grade:'A', color:'var(--cyan)' },
+    { id:'NX-NN-102', name:'Neural Network Architecture', instructor:'Prof. Sam Iyer', progress:74, grade:'A-', color:'var(--purple)' },
+    { id:'NX-PY-201', name:'Advanced Python for AI', instructor:'Dr. Lin Zhang', progress:92, grade:'A+', color:'var(--green)' },
+    { id:'NX-CV-301', name:'Computer Vision & Image AI', instructor:'Dr. Aria Voss', progress:68, grade:'B+', color:'var(--gold)' },
+    { id:'NX-NL-201', name:'Natural Language Processing', instructor:'Prof. Ravi Chen', progress:81, grade:'A-', color:'var(--pink)' },
+    { id:'NX-ET-401', name:'Ethics in Artificial Intelligence', instructor:'Dr. Maya Hill', progress:95, grade:'A+', color:'var(--cyan)' },
+  ],
+  assignments: [
+    { title:'Neural Network Lab Report', course:'NX-NN-102', due:'Jun 20, 2026', status:'pending' },
+    { title:'Python ML Pipeline Project', course:'NX-PY-201', due:'Jun 18, 2026', status:'done' },
+    { title:'Computer Vision Dataset Analysis', course:'NX-CV-301', due:'Jun 15, 2026', status:'due' },
+    { title:'NLP Sentiment Model', course:'NX-NL-201', due:'Jun 28, 2026', status:'pending' },
+    { title:'Ethics Essay: AI Bias', course:'NX-ET-401', due:'Jun 22, 2026', status:'done' },
+    { title:'CV Mini Hackathon Entry', course:'NX-CV-301', due:'Jun 30, 2026', status:'pending' },
+  ],
+  grades: [
+    { course:'Machine Learning Fundamentals', mid:88, final:91, assignment:85, total:'A (91.4%)', color:'var(--cyan)' },
+    { course:'Neural Network Architecture', mid:80, final:78, assignment:83, total:'A- (80.3%)', color:'var(--purple)' },
+    { course:'Advanced Python for AI', mid:95, final:96, assignment:94, total:'A+ (95.1%)', color:'var(--green)' },
+    { course:'Computer Vision & Image AI', mid:72, final:74, assignment:79, total:'B+ (75.0%)', color:'var(--gold)' },
+    { course:'NLP', mid:84, final:86, assignment:88, total:'A- (86.0%)', color:'var(--pink)' },
+    { course:'Ethics in AI', mid:97, final:98, assignment:95, total:'A+ (96.7%)', color:'var(--cyan)' },
+  ],
+  testimonials: [
+    { name:'Priya S.', role:'AI & Robotics, Year 3', avi:'PS', bg:'linear-gradient(135deg,#00e5ff,#a855f7)', text:'NexaLearn completely rewired how I think. The AI tutor adapts to me daily — I learn faster than I ever did with traditional methods.' },
+    { name:'Luca M.', role:'Quantum Physics, Year 2', avi:'LM', bg:'linear-gradient(135deg,#a855f7,#ec4899)', text:'Walking inside a simulated atom using the holographic lab was my "eureka" moment. No textbook could ever replicate that.' },
+    { name:'Fatima K.', role:'BioTech, Year 4', avi:'FK', bg:'linear-gradient(135deg,#10b981,#00e5ff)', text:'I\'ve already published two research papers — as a student! The faculty connections and lab access here are unmatched globally.' },
+    { name:'Haruto N.', role:'Space Systems, Year 1', avi:'HN', bg:'linear-gradient(135deg,#f59e0b,#ec4899)', text:'Being able to run actual simulations on real mission data from NASA partners is something no other school in the world offers.' },
+    { name:'Amara O.', role:'Climate Tech, Year 3', avi:'AO', bg:'linear-gradient(135deg,#10b981,#f59e0b)', text:'The interdisciplinary approach here is incredible. I\'m combining AI, policy, and environmental science in ways I never imagined possible.' },
+    { name:'Elena V.', role:'Digital Arts, Year 2', avi:'EV', bg:'linear-gradient(135deg,#ec4899,#a855f7)', text:'The Holodecks changed art for me forever. I can sculpt in 3D space, paint with light, and program interactive installations simultaneously.' },
+  ],
+  aiResponses: [
+    'Great question! Let me break that down using the Feynman technique...',
+    'Based on your learning history, I\'d recommend reviewing Chapter 7 on Backpropagation before we dive into this.',
+    'Excellent progress, Arjun! Your understanding of convolutional layers has improved 23% this week.',
+    'Here\'s a visual analogy: think of a neural network like a team of specialists, each handling a specific feature of the input...',
+    'Your recent quiz score suggests you should spend more time on gradient descent. Want me to create a personalized practice set?',
+    'Remember from yesterday\'s session — the key insight here is that attention mechanisms allow the model to dynamically weight different parts of the input sequence.',
+  ]
+};
+
+/* ── LOADER ──────────────────────────────── */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+    startHeroCounters();
+  }, 2200);
+});
+
+/* ── STAR FIELD ──────────────────────────── */
+const starCanvas = document.getElementById('starfield');
+const sCtx = starCanvas.getContext('2d');
+let stars = [];
+function resizeStars() {
+  starCanvas.width = window.innerWidth;
+  starCanvas.height = window.innerHeight;
+  stars = Array.from({length:200}, () => ({
+    x: Math.random() * starCanvas.width,
+    y: Math.random() * starCanvas.height,
+    r: Math.random() * 1.5 + 0.2,
+    o: Math.random(),
+    s: Math.random() * 0.008 + 0.002,
+    d: Math.random() > 0.5 ? 1 : -1
+  }));
+}
+function animateStars() {
+  sCtx.clearRect(0,0,starCanvas.width,starCanvas.height);
+  stars.forEach(s => {
+    s.o += s.s * s.d;
+    if(s.o > 1 || s.o < 0.1) s.d *= -1;
+    sCtx.beginPath();
+    sCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    sCtx.fillStyle = `rgba(255,255,255,${s.o})`;
+    sCtx.fill();
+  });
+  requestAnimationFrame(animateStars);
+}
+resizeStars();
+animateStars();
+window.addEventListener('resize', resizeStars);
+
+/* ── PARTICLES CANVAS ────────────────────── */
+const pCanvas = document.getElementById('particles');
+const pCtx = pCanvas.getContext('2d');
+let particles = [];
+function resizeParticles() {
+  pCanvas.width = pCanvas.offsetWidth;
+  pCanvas.height = pCanvas.offsetHeight;
+}
+function initParticles() {
+  particles = Array.from({length:60}, () => ({
+    x: Math.random() * pCanvas.width,
+    y: Math.random() * pCanvas.height,
+    vx: (Math.random()-0.5)*0.5,
+    vy: (Math.random()-0.5)*0.5,
+    r: Math.random()*2+1,
+    c: Math.random() > 0.5 ? '0,229,255' : '168,85,247'
+  }));
+}
+function animateParticles() {
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>pCanvas.width) p.vx*=-1;
+    if(p.y<0||p.y>pCanvas.height) p.vy*=-1;
+    pCtx.beginPath();
+    pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    pCtx.fillStyle=`rgba(${p.c},0.4)`;
+    pCtx.fill();
+  });
+  // Draw connections
+  particles.forEach((p,i)=>{
+    particles.slice(i+1).forEach(q=>{
+      const d=Math.hypot(p.x-q.x,p.y-q.y);
+      if(d<120){
+        pCtx.beginPath();
+        pCtx.moveTo(p.x,p.y);
+        pCtx.lineTo(q.x,q.y);
+        pCtx.strokeStyle=`rgba(0,229,255,${0.15*(1-d/120)})`;
+        pCtx.lineWidth=0.5;
+        pCtx.stroke();
+      }
+    });
+  });
+  requestAnimationFrame(animateParticles);
+}
+window.addEventListener('load',()=>{
+  resizeParticles();
+  initParticles();
+  animateParticles();
+});
+window.addEventListener('resize',()=>{resizeParticles();initParticles();});
+
+/* ── CURSOR GLOW ─────────────────────────── */
+document.addEventListener('mousemove',e=>{
+  const g=document.getElementById('cursor-glow');
+  g.style.left=e.clientX+'px';
+  g.style.top=e.clientY+'px';
+});
+
+/* ── CARD MOUSE GRADIENT ─────────────────── */
+document.querySelectorAll('.program-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const rect=card.getBoundingClientRect();
+    const x=((e.clientX-rect.left)/rect.width*100)+'%';
+    const y=((e.clientY-rect.top)/rect.height*100)+'%';
+    card.style.setProperty('--mx',x);
+    card.style.setProperty('--my',y);
+  });
+});
+
+/* ── SCROLL EVENTS ───────────────────────── */
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  document.getElementById('main-nav').classList.toggle('scrolled',y>50);
+  document.getElementById('back-top').classList.toggle('visible',y>400);
+  // Reveal
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>{
+    if(el.getBoundingClientRect().top < window.innerHeight - 80) el.classList.add('visible');
+  });
+  // Stat counters
+  document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+    if(el.getBoundingClientRect().top < window.innerHeight - 40 && !el.dataset.done) {
+      el.dataset.done=1;
+      animateCount(el,parseFloat(el.dataset.target),el.dataset.suffix||'');
+    }
+  });
+});
+// Trigger once on load
+window.dispatchEvent(new Event('scroll'));
+
+/* ── HERO COUNTERS ───────────────────────── */
+function startHeroCounters(){
+  const els=[
+    {id:'c-students',target:50000,suffix:'+'},
+    {id:'c-programs',target:24,suffix:''},
+    {id:'c-alumni',target:200000,suffix:'+'},
+    {id:'c-rating',target:98,suffix:'%'},
+  ];
+  els.forEach(({id,target,suffix},i)=>{
+    setTimeout(()=>{
+      const el=document.getElementById(id);
+      if(el) animateCount(el,target,suffix);
+    },i*200);
+  });
+}
+function animateCount(el,target,suffix){
+  const dur=2000, start=Date.now();
+  const isFloat=target%1!==0;
+  function step(){
+    const p=Math.min((Date.now()-start)/dur,1);
+    const ease=1-Math.pow(1-p,4);
+    const val=target*ease;
+    el.textContent=(isFloat?val.toFixed(1):Math.round(val).toLocaleString())+suffix;
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent=(isFloat?target.toFixed(1):target.toLocaleString())+suffix;
+  }
+  step();
+}
+
+/* ── NEURAL VISUALIZER ───────────────────── */
+(function buildNeural(){
+  const container=document.getElementById('neural-viz');
+  if(!container) return;
+  const w=container.offsetWidth||400, h=120;
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width','100%'); svg.setAttribute('height',h);
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const layers=[[0.15,0.5],[0.3,0.2],[0.3,0.5],[0.3,0.8],[0.5,0.3],[0.5,0.5],[0.5,0.7],[0.7,0.2],[0.7,0.5],[0.7,0.8],[0.85,0.5]];
+  const nodes=layers.map(([rx,ry])=>({x:rx*w,y:ry*h}));
+  const connections=[[0,1],[0,4],[0,7],[1,4],[1,5],[2,4],[2,5],[2,6],[3,5],[3,6],[4,7],[4,8],[5,7],[5,8],[5,9],[6,8],[6,9],[7,10],[8,10],[9,10]];
+  connections.forEach(([a,b])=>{
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',nodes[a].x); line.setAttribute('y1',nodes[a].y);
+    line.setAttribute('x2',nodes[b].x); line.setAttribute('y2',nodes[b].y);
+    line.setAttribute('stroke','rgba(0,229,255,0.15)'); line.setAttribute('stroke-width','1');
+    const id=`np-${a}-${b}`;
+    line.setAttribute('id',id);
+    svg.appendChild(line);
+  });
+  nodes.forEach((n,i)=>{
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r','6');
+    c.setAttribute('fill','rgba(4,6,15,1)');
+    c.setAttribute('stroke','rgba(0,229,255,0.5)'); c.setAttribute('stroke-width','1.5');
+    c.setAttribute('id',`nc-${i}`);
+    svg.appendChild(c);
+  });
+  container.appendChild(svg);
+  // Animate signal
+  function fireSignal(){
+    const path=[0,1,4,7,10]; // example path
+    path.forEach((ni,idx)=>{
+      setTimeout(()=>{
+        const nc=document.getElementById(`nc-${ni}`);
+        if(!nc) return;
+        nc.setAttribute('stroke','var(--cyan)');
+        nc.setAttribute('fill','rgba(0,229,255,0.2)');
+        setTimeout(()=>{ nc.setAttribute('stroke','rgba(0,229,255,0.5)'); nc.setAttribute('fill','rgba(4,6,15,1)'); },300);
+      },idx*160);
+    });
+  }
+  setInterval(fireSignal,1800);
+  setInterval(()=>{ const alt=[0,2,5,8,10]; alt.forEach((ni,idx)=>{ setTimeout(()=>{ const nc=document.getElementById(`nc-${ni}`); if(nc){ nc.setAttribute('stroke','var(--purple)'); nc.setAttribute('fill','rgba(168,85,247,0.2)'); setTimeout(()=>{ nc.setAttribute('stroke','rgba(0,229,255,0.5)'); nc.setAttribute('fill','rgba(4,6,15,1)'); },300); } },idx*150); }); },2700);
+})();
+
+/* ── PROGRESS RINGS ──────────────────────── */
+(function buildRings(){
+  const c=document.getElementById('ring-container');
+  if(!c) return;
+  const rings=[{label:'Math',val:85,color:'#00e5ff'},{label:'Code',val:92,color:'#a855f7'},{label:'Science',val:78,color:'#10b981'},{label:'Art',val:67,color:'#f59e0b'}];
+  rings.forEach(({label,val,color})=>{
+    const wrap=document.createElement('div'); wrap.className='ring-wrap';
+    const r=44, circ=2*Math.PI*r;
+    wrap.innerHTML=`<svg class="ring" width="54" height="54" viewBox="0 0 100 100">
+      <circle class="ring-bg" cx="50" cy="50" r="${r}"/>
+      <circle class="ring-fill" cx="50" cy="50" r="${r}" stroke="${color}" stroke-dasharray="${val/100*circ} ${circ}" style="stroke-dashoffset:${circ}"/>
+      <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="${color}" font-size="18" font-weight="700">${val}</text>
+    </svg><span>${label}</span>`;
+    c.appendChild(wrap);
+    setTimeout(()=>{
+      const fill=wrap.querySelector('.ring-fill');
+      fill.style.strokeDashoffset='0';
+      fill.style.transition='stroke-dashoffset 1.5s ease';
+    },500);
+  });
+})();
+
+/* ── TERMINAL TYPEWRITER ─────────────────── */
+(function typeTerminal(){
+  const body=document.getElementById('terminal-body');
+  if(!body) return;
+  const lines=[
+    {t:'cmd',txt:'$ nexalearn init --student AK-2026'},
+    {t:'out',txt:'✓ Learning profile loaded'},
+    {t:'out',txt:'✓ Neural adaption: ACTIVE'},
+    {t:'cmd',txt:'$ nx run --course ML-101 --lab'},
+    {t:'out',txt:'Launching ML sandbox...'},
+    {t:'mute',txt:'[████████████] 100%'},
+    {t:'out',txt:'✓ Lab environment ready!'},
+  ];
+  let i=0;
+  function typeLine(){
+    if(i>=lines.length){ i=0; body.innerHTML='<div class="mute">// NexaLearn Cloud Shell v4.2</div>'; return; }
+    const {t,txt}=lines[i++];
+    const div=document.createElement('div');
+    div.className=t;
+    div.textContent='';
+    body.appendChild(div);
+    let ci=0;
+    const iv=setInterval(()=>{
+      div.textContent+=txt[ci++];
+      if(ci>=txt.length){ clearInterval(iv); setTimeout(typeLine,400); }
+    },40);
+  }
+  setTimeout(typeLine,1000);
+  setInterval(()=>{ i=0; body.innerHTML='<div class="mute">// NexaLearn Cloud Shell v4.2</div>'; typeLine(); },12000);
+})();
+
+/* ── PORTAL RENDER ───────────────────────── */
+function switchPortal(el,id){
+  document.querySelectorAll('.portal-nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.portal-section').forEach(s=>s.classList.remove('active'));
+  const section=document.getElementById(id);
+  if(section) section.classList.add('active');
+  if(id==='courses' && !section.dataset.built) renderCourses(section);
+  if(id==='assignments' && !section.dataset.built) renderAssignments(section);
+  if(id==='grades' && !section.dataset.built) renderGrades(section);
+  if(id==='ai-tutor' && !section.dataset.built) initChat(section);
+}
+function renderCourses(section){
+  const list=document.getElementById('courses-list');
+  list.innerHTML=DB.courses.map(c=>`
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:0.75rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;transition:border-color 0.2s" onmouseenter="this.style.borderColor='var(--border2)'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div>
+        <div style="font-size:0.65rem;font-weight:700;color:${c.color};letter-spacing:0.08em;margin-bottom:0.25rem">${c.id}</div>
+        <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.25rem">${c.name}</div>
+        <div style="font-size:0.75rem;color:var(--muted)">${c.instructor}</div>
+        <div style="margin-top:0.75rem;height:4px;background:var(--bg);border-radius:2px;overflow:hidden"><div style="width:${c.progress}%;height:100%;background:${c.color};border-radius:2px;transition:width 1.5s ease"></div></div>
+      </div>
+      <div style="text-align:right"><div style="font-size:1.5rem;font-weight:900;color:${c.color}">${c.grade}</div><div style="font-size:0.7rem;color:var(--muted)">Grade</div></div>
+    </div>
+  `).join('');
+  section.dataset.built=1;
+  setTimeout(()=>list.querySelectorAll('[style*="transition:width"]').forEach(b=>b.style.width=b.style.width),50);
+}
+function renderAssignments(section){
+  const list=document.getElementById('assignments-list');
+  list.innerHTML=DB.assignments.map(a=>`
+    <li class="assignment-item">
+      <div class="assign-status ${a.status}"></div>
+      <div>
+        <div class="assign-title">${a.title}</div>
+        <div class="assign-sub">${a.course}</div>
+      </div>
+      <div class="assign-due">${a.due}<br><span style="color:${a.status==='done'?'var(--green)':a.status==='due'?'var(--pink)':'var(--gold)'};font-weight:700;font-size:0.7rem">${a.status.toUpperCase()}</span></div>
+    </li>
+  `).join('');
+  section.dataset.built=1;
+}
+function renderGrades(section){
+  const list=document.getElementById('grades-list');
+  list.innerHTML=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+    <thead><tr style="border-bottom:1px solid var(--border)">
+      <th style="text-align:left;padding:0.75rem 0.5rem;color:var(--muted);font-size:0.75rem;font-weight:700">Course</th>
+      <th style="padding:0.75rem 0.5rem;color:var(--muted);font-size:0.75rem;font-weight:700">Mid</th>
+      <th style="padding:0.75rem 0.5rem;color:var(--muted);font-size:0.75rem;font-weight:700">Final</th>
+      <th style="padding:0.75rem 0.5rem;color:var(--muted);font-size:0.75rem;font-weight:700">Assign.</th>
+      <th style="padding:0.75rem 0.5rem;color:var(--muted);font-size:0.75rem;font-weight:700">Total</th>
+    </tr></thead>
+    <tbody>${DB.grades.map((g,i)=>`
+    <tr style="border-bottom:1px solid var(--border);transition:background 0.2s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=''">
+      <td style="padding:0.75rem 0.5rem;font-weight:600"><span style="color:${g.color};margin-right:0.5rem">●</span>${g.course}</td>
+      <td style="text-align:center;padding:0.75rem 0.5rem">${g.mid}</td>
+      <td style="text-align:center;padding:0.75rem 0.5rem">${g.final}</td>
+      <td style="text-align:center;padding:0.75rem 0.5rem">${g.assignment}</td>
+      <td style="text-align:center;padding:0.75rem 0.5rem;font-weight:700;color:${g.color}">${g.total}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+  section.dataset.built=1;
+}
+function initChat(section){
+  const msgs=document.getElementById('chat-messages');
+  appendMsg(msgs,'ai','Hello Arjun! 👋 I\'m Nexa, your personal AI tutor. How can I help you today?');
+  section.dataset.built=1;
+}
+function appendMsg(container,role,text){
+  const div=document.createElement('div');
+  div.style.cssText=`display:flex;gap:0.5rem;align-items:flex-start;justify-content:${role==='user'?'flex-end':'flex-start'}`;
+  if(role==='ai') div.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0">🤖</div><div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.625rem 0.875rem;font-size:0.82rem;max-width:80%;line-height:1.6;color:var(--text)">${text}</div>`;
+  else div.innerHTML=`<div style="background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:10px;padding:0.625rem 0.875rem;font-size:0.82rem;max-width:80%;line-height:1.6;color:#000;font-weight:500">${text}</div>`;
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+}
+function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const msgs=document.getElementById('chat-messages');
+  const msg=inp.value.trim();
+  if(!msg) return;
+  appendMsg(msgs,'user',msg);
+  inp.value='';
+  // Typing indicator
+  const typing=document.createElement('div');
+  typing.style.cssText='display:flex;gap:0.5rem;align-items:center';
+  typing.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:0.75rem">🤖</div><div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.625rem 0.875rem;font-size:0.82rem;color:var(--muted)">Nexa is thinking...</div>`;
+  msgs.appendChild(typing);
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    msgs.removeChild(typing);
+    const r=DB.aiResponses[Math.floor(Math.random()*DB.aiResponses.length)];
+    appendMsg(msgs,'ai',r);
+  },1000+Math.random()*800);
+}
+
+/* ── TESTIMONIALS ────────────────────────── */
+(function buildTestimonials(){
+  const track=document.getElementById('testimonials-track');
+  if(!track) return;
+  const all=[...DB.testimonials,...DB.testimonials];
+  track.innerHTML=all.map(t=>`
+    <div class="testimonial-card">
+      <div class="test-stars">★★★★★</div>
+      <div class="test-text">"${t.text}"</div>
+      <div class="test-author">
+        <div class="test-avi" style="background:${t.bg}">${t.avi}</div>
+        <div><div class="test-author-name">${t.name}</div><div class="test-author-role">${t.role}</div></div>
+      </div>
+    </div>
+  `).join('');
+})();
+
+/* ── SCHEDULE TABS ───────────────────────── */
+function switchTab(btn,id){
+  document.querySelectorAll('.schedule-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.timetable').forEach(t=>t.classList.remove('active'));
+  const target=document.getElementById(id);
+  if(target) target.classList.add('active');
+}
+
+/* ── ADMISSIONS FORM ─────────────────────── */
+let currentStep=1;
+function nextStep(n){
+  if(n>currentStep && !validateStep(currentStep)) return;
+  document.getElementById(`fp-${currentStep}`).classList.remove('active');
+  // Update steps UI
+  const old=document.getElementById(`sn-${currentStep}`);
+  if(n>currentStep){ old.classList.remove('active'); old.classList.add('done'); old.textContent='✓'; }
+  else { old.classList.remove('done','active'); old.textContent=currentStep; }
+  currentStep=n;
+  document.getElementById(`fp-${n}`)?.classList.add('active');
+  document.getElementById(`sn-${n}`)?.classList.add('active');
+  document.getElementById(`sn-${n}`)?.classList.remove('done');
+  // Lines
+  [1,2].forEach(i=>{
+    const sl=document.getElementById(`sl-${i}`);
+    if(sl) sl.classList.toggle('done', currentStep>i+1 || (i===1&&currentStep>=2&&n>2));
+  });
+  if(n===2){ const sl=document.getElementById('sl-1'); if(sl) sl.classList.add('done'); }
+  if(n===3){ renderReview(); [1,2].forEach(i=>{ const sl=document.getElementById(`sl-${i}`); if(sl) sl.classList.add('done'); }); }
+}
+function validateStep(step){
+  if(step===1){
+    const fname=document.getElementById('f-fname')?.value.trim();
+    const email=document.getElementById('f-email')?.value.trim();
+    if(!fname){ showToast('Please enter your first name.','⚠️ Missing Information'); return false; }
+    if(!email||!email.includes('@')){ showToast('Please enter a valid email.','⚠️ Invalid Email'); return false; }
+  }
+  if(step===2){
+    const school=document.getElementById('f-school')?.value.trim();
+    if(!school){ showToast('Please enter your previous school.','⚠️ Missing Information'); return false; }
+  }
+  return true;
+}
+function renderReview(){
+  const fname=document.getElementById('f-fname')?.value||'—';
+  const lname=document.getElementById('f-lname')?.value||'—';
+  const email=document.getElementById('f-email')?.value||'—';
+  const country=document.getElementById('f-country')?.value||'—';
+  const program=document.getElementById('f-program')?.value||'—';
+  const school=document.getElementById('f-school')?.value||'—';
+  const score=document.getElementById('f-score')?.value||'—';
+  document.getElementById('review-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 1.5rem">
+      <div><span style="color:var(--muted);font-size:0.78rem">Name</span><br><strong>${fname} ${lname}</strong></div>
+      <div><span style="color:var(--muted);font-size:0.78rem">Email</span><br><strong>${email}</strong></div>
+      <div><span style="color:var(--muted);font-size:0.78rem">Country</span><br><strong>${country}</strong></div>
+      <div><span style="color:var(--muted);font-size:0.78rem">Score</span><br><strong>${score}%</strong></div>
+      <div style="grid-column:span 2"><span style="color:var(--muted);font-size:0.78rem">Program</span><br><strong style="color:var(--cyan)">${program}</strong></div>
+      <div style="grid-column:span 2"><span style="color:var(--muted);font-size:0.78rem">Previous School</span><br><strong>${school}</strong></div>
+    </div>`;
+}
+function submitForm(){
+  if(!document.getElementById('agree')?.checked){ showToast('Please agree to the Terms & Conditions.','⚠️ Agreement Required'); return; }
+  document.querySelectorAll('.form-page').forEach(p=>p.classList.remove('active'));
+  const success=document.getElementById('form-success');
+  success.style.display='block';
+  document.getElementById('app-id').textContent='NX-'+Math.floor(100000+Math.random()*900000);
+  showToast('Your application has been submitted successfully!','🚀 Application Received');
+}
+function resetForm(){
+  currentStep=1;
+  document.getElementById('form-success').style.display='none';
+  document.getElementById('fp-1').classList.add('active');
+  [1,2,3].forEach(i=>{
+    const sn=document.getElementById(`sn-${i}`);
+    if(sn){ sn.classList.remove('active','done'); sn.textContent=i; }
+  });
+  document.getElementById('sn-1').classList.add('active');
+  [1,2].forEach(i=>{ const sl=document.getElementById(`sl-${i}`); if(sl) sl.classList.remove('done'); });
+  ['f-fname','f-lname','f-email','f-school','f-score','f-statement'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const ag=document.getElementById('agree'); if(ag) ag.checked=false;
+}
+
+/* ── TOAST ───────────────────────────────── */
+let toastTimer;
+function showToast(msg,title='Notification'){
+  clearTimeout(toastTimer);
+  document.getElementById('toast-title').textContent=title;
+  document.getElementById('toast-msg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+/* ── MOBILE NAV ──────────────────────────── */
+function toggleMobileNav(){
+  document.getElementById('mobile-nav').classList.toggle('open');
+}
+
+/* ── HELPER ──────────────────────────────── */
+function scrollTo(selector){
+  const el=document.querySelector(selector);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>
