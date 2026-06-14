@@ -1,7 +1,10 @@
 <p align="center">
   <img width="1919" height="959" alt="Screenshot 2026-06-14 113010" src="https://github.com/user-attachments/assets/bc3f6f9d-ed1c-43bd-bc6c-2e505e8c3836" />
+  <img width="1919" height="989" alt="Screenshot 2026-06-14 204915" src="https://github.com/user-attachments/assets/d053efd6-fb1e-48c8-8f07-25b12770c805" />
+
 <img width="1919" height="1000" alt="Screenshot 2026-06-14 113501" src="https://github.com/user-attachments/assets/c8f3d3a8-8080-41ed-a205-b24d93a7bc63" />
 <img width="1919" height="997" alt="Screenshot 2026-06-14 113520" src="https://github.com/user-attachments/assets/fc15b1c6-2147-4e31-8181-cc984ce181c2" />
+<img width="1919" height="989" alt="Screenshot 2026-06-14 204915" src="https://github.com/user-attachments/assets/d053efd6-fb1e-48c8-8f07-25b12770c805" />
 
 </p>
 
